@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>比色卡识别工具</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f5f5f5;
+text-align:center;
+padding:20px;
+}
+
+h1{
+margin-bottom:10px;
+}
+
+canvas{
+border:1px solid #ccc;
+max-width:95%;
+margin-top:15px;
+cursor:crosshair;
+}
+
+.panel{
+background:white;
+padding:15px;
+border-radius:10px;
+margin-top:15px;
+box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+#colorBox{
+width:120px;
+height:120px;
+margin:10px auto;
+border:1px solid black;
+border-radius:8px;
+}
+
+button{
+padding:8px 18px;
+margin-top:10px;
+font-size:16px;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>比色卡检测工具</h1>
+
+<input type="file" accept="image/*" capture="environment" id="upload">
+
+<br>
+
+<canvas id="canvas"></canvas>
+
+<div class="panel">
+
+<div id="colorBox"></div>
+
+<p id="rgb">RGB: -</p>
+<p id="hex">HEX: -</p>
+<p id="range">色卡区间: -</p>
+
+</div>
+
+<script>
+
+const canvas = document.getElementById("canvas")
+const ctx = canvas.getContext("2d")
+
+const upload = document.getElementById("upload")
+
+// 示例比色卡（可以自己改）
+const colorCard = [
+{value:0, rgb:[240,240,240]},
+{value:1, rgb:[210,210,210]},
+{value:2, rgb:[180,180,180]},
+{value:3, rgb:[150,150,150]},
+{value:4, rgb:[120,120,120]},
+{value:5, rgb:[90,90,90]}
+]
+
+let imgLoaded=false
+
+upload.onchange = function(e){
+
+const file = e.target.files[0]
+
+const img = new Image()
+
+img.onload=function(){
+
+canvas.width=img.width
+canvas.height=img.height
+
+ctx.drawImage(img,0,0)
+
+imgLoaded=true
+
+}
+
+img.src = URL.createObjectURL(file)
+
+}
+
+
+// 点击检测颜色
+
+canvas.addEventListener("click",function(e){
+
+if(!imgLoaded) return
+
+const rect = canvas.getBoundingClientRect()
+
+const x = Math.floor((e.clientX-rect.left)*(canvas.width/rect.width))
+const y = Math.floor((e.clientY-rect.top)*(canvas.height/rect.height))
+
+const color = getAverageColor(x,y,10)
+
+showColor(color)
+
+})
+
+
+// 计算平均颜色（减少误差）
+
+function getAverageColor(cx,cy,size){
+
+let r=0,g=0,b=0,count=0
+
+for(let x=-size;x<=size;x++){
+
+for(let y=-size;y<=size;y++){
+
+const px=cx+x
+const py=cy+y
+
+if(px>=0 && py>=0 && px<canvas.width && py<canvas.height){
+
+const data=ctx.getImageData(px,py,1,1).data
+
+r+=data[0]
+g+=data[1]
+b+=data[2]
+
+count++
+
+}
+
+}
+
+}
+
+return[
+Math.floor(r/count),
+Math.floor(g/count),
+Math.floor(b/count)
+]
+
+}
+
+
+// RGB转HEX
+
+function rgbToHex(r,g,b){
+
+return "#"+[r,g,b].map(x=>{
+const hex=x.toString(16)
+return hex.length===1?"0"+hex:hex
+}).join("")
+
+}
+
+
+// 计算颜色距离
+
+function colorDistance(c1,c2){
+
+return Math.sqrt(
+(c1[0]-c2[0])**2+
+(c1[1]-c2[1])**2+
+(c1[2]-c2[2])**2
+)
+
+}
+
+
+// 匹配比色卡
+
+function findRange(rgb){
+
+let min1=Infinity
+let min2=Infinity
+
+let idx1=-1
+let idx2=-1
+
+colorCard.forEach((c,i)=>{
+
+const d=colorDistance(rgb,c.rgb)
+
+if(d<min1){
+
+min2=min1
+idx2=idx1
+
+min1=d
+idx1=i
+
+}else if(d<min2){
+
+min2=d
+idx2=i
+
+}
+
+})
+
+const v1=colorCard[idx1].value
+const v2=colorCard[idx2].value
+
+return `${Math.min(v1,v2)} ~ ${Math.max(v1,v2)}`
+
+}
+
+
+// 显示结果
+
+function showColor(rgb){
+
+const [r,g,b]=rgb
+
+document.getElementById("rgb").innerText=`RGB: ${r}, ${g}, ${b}`
+
+const hex=rgbToHex(r,g,b)
+
+document.getElementById("hex").innerText=`HEX: ${hex}`
+
+document.getElementById("colorBox").style.background=hex
+
+const range=findRange(rgb)
+
+document.getElementById("range").innerText=`色卡区间: ${range}`
+
+}
+
+</script>
+
+</body>
+</html>
