@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>功能页 - Aquacheck水质监测平台</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+      margin: 0;
+    }
+
+    .header {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .h1 {
+      margin: 0;
+      color: #2c3e50;
+      font-size: 1.5em;
+    }
+
+    .instruction {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      margin: 15px auto;
+      max-width: 800px;
+      text-align: left;
+    }
+
+    .color-card-reference {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      margin: 15px auto;
+      max-width: 800px;
+      text-align: left;
+    }
+
+    .color-card-reference h3 {
+      margin-top: 0;
+    }
+
+    .upload-section {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      margin: 15px auto;
+      max-width: 800px;
+      text-align: center;
+      cursor: pointer;
+      transition: background-color 0.3s, border 0.3s;
+      border: 2px dashed #3498db;
+    }
+
+    .upload-section:hover,
+    .upload-section.drag-over {
+      background-color: #f0f8ff;
+      border: 2px solid #3498db;
+    }
+
+    #upload-input {
+      display: none;
+    }
+
+    .upload-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .upload-icon {
+      font-size: 48px;
+      color: #3498db;
+      margin-bottom: 15px;
+    }
+
+    .upload-text {
+      font-size: 18px;
+      color: #2c3e50;
+      margin: 10px 0;
+    }
+
+    .upload-hint {
+      color: #7f8c8d;
+      font-size: 14px;
+    }
+
+    .image-preview {
+      max-width: 100%;
+      max-height: 400px;
+      display: none;
+      cursor: crosshair;
+      margin: 15px auto;
+      border: 1px solid #ddd;
+    }
+
+    .image-actions {
+      margin-top: 10px;
+      display: none;
+    }
+
+    .canvas-overlay {
+      position: absolute;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 16px;
+      display: none;
+      z-index: 10;
+    }
+
+    .result-panel {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      margin: 15px auto;
+      max-width: 800px;
+      text-align: center;
+    }
+
+    #colorBox {
+      width: 120px;
+      height: 120px;
+      margin: 10px auto;
+      border: 2px solid #333;
+      border-radius: 8px;
+    }
+
+    .button-container {
+      margin: 20px 0;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      margin: 0 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background: #3498db;
+      color: white;
+    }
+
+    .btn-output {
+      background: #2ecc71;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+    }
+
+    .footer {
+      margin-top: 30px;
+      padding: 15px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      font-size: 0.9em;
+      color: #7f8c8d;
+      text-align: center;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+      background-color: white;
+      margin: 5% auto;
+      padding: 20px;
+      border: none;
+      border-radius: 10px;
+      width: 80%;
+      max-width: 700px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close:hover {
+      color: #000;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    th,
+    td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    .calibrate-btn {
+      background: #9b59b6;
+      color: white;
+      padding: 8px 16px;
+      margin: 10px 5px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .info-box {
+      background-color: #e7f3ff;
+      border: 1px solid #b3d9ff;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      text-align: left;
+    }
+
+    .indicator-title {
+      font-size: 1.3em;
+      color: #2c3e50;
+      margin: 0 0 10px 0;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #eee;
+    }
+
+    .instruction-after-upload {
+      background-color: #d4edda;
+      border: 1px solid #c3e6c3;
+      color: #155724;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 15px 0;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <h1 class="h1">Aquacheck水体多项指标快速智能监测平台</h1>
+  </div>
+
+  <div class="instruction">
+    <p><strong>顶部提示语：</strong>请在自然光下，使用相机拍摄检测完成后的试剂盒，并点击上传文件</p>
+  </div>
+
+  <div class="color-card-reference">
+    <h3>参考图区域：本地参考色纸</h3>
+    <div class="info-box">
+      <p><strong>重要提示：</strong>请确保拍摄的照片中包含标准灰度参考色块（灰度0和灰度100），这将有助于减少环境光对结果判定的影响。</p>
+    </div>
+    <div style="display: flex; justify-content: space-around;">
+      <div style="text-align: center;">
+        <div style="width: 80px; height: 80px; background-color: #f0f0f0; margin: 0 auto; border: 1px solid #333;">
+        </div>
+        <p>标准灰度0%</p>
+      </div>
+      <div style="text-align: center;">
+        <div style="width: 80px; height: 80px; background-color: #ffffff; margin: 0 auto; border: 1px solid #333;">
+        </div>
+        <p>标准灰度100%</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="upload-section" id="uploadSection">
+    <div class="upload-area">
+      <div class="upload-icon">📁</div>
+      <h3>上传区域</h3>
+      <p class="upload-text">点击此处上传图片文件 或 拖拽图片至此</p>
+      <p class="upload-hint">支持格式：png、jpg、jpeg（预留兼容：heif、heic）</p>
+    </div>
+    <input type="file" id="upload-input" accept="image/*" capture="environment">
+  </div>
+
+  <img id="imagePreview" class="image-preview" alt="图片预览">
+  <div class="instruction-after-upload" id="afterUploadInstruction">
+    <p><strong>操作提示：</strong>图片已成功上传！请点击图片上的检测区域获取检测结果。</p>
+  </div>
+  <div class="image-actions" id="imageActions">
+    <button class="calibrate-btn" id="calibrateBtn">校准图像</button>
+    <span id="calibrationStatus">未校准</span>
+  </div>
+
+  <div class="result-panel" id="resultPanel" style="display:none;">
+    <h3 class="indicator-title" id="indicatorTitle">总磷(TP)检测</h3>
+    <div id="colorBox"></div>
+    <p id="rgb">RGB: -</p>
+    <p id="hex">HEX: -</p>
+    <p id="range">检测值: -</p>
+    <p id="recommendation">建议: -</p>
+
+    <div class="button-container">
+      <button class="btn" id="continueBtn">继续检测</button>
+      <button class="btn btn-output" id="outputTableBtn">输出表格</button>
+    </div>
+
+    <div class="info-box">
+      <p><strong>环境光校正：</strong>点击下方按钮对图像进行校正，以减少环境光对结果的影响</p>
+      <button class="calibrate-btn" id="calibrateBtn2">校准图像</button>
+      <span id="calibrationStatus2">未校准</span>
+    </div>
+  </div>
+
+  <!-- 表格输出弹窗 -->
+  <div id="tableModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>检测结果表格</h2>
+      <form id="tableForm">
+        <table>
+          <tr>
+            <td>项目名称</td>
+            <td><input type="text" id="projectName" placeholder="系统自动生成" style="width:100%; padding:5px;"></td>
+            <td>检测时间</td>
+            <td id="detectTime"></td>
+          </tr>
+          <tr>
+            <td>检测位置</td>
+            <td><input type="text" value="未知" placeholder="请输入检测位置" style="width:100%; padding:5px;"></td>
+            <td>检测人员</td>
+            <td><input type="text" placeholder="请输入检测人员" style="width:100%; padding:5px;"></td>
+          </tr>
+          <tr>
+            <td colspan="4">指标 & 范围(单位) & 建议</td>
+          </tr>
+          <tr>
+            <td>总磷(TP)</td>
+            <td id="tpResult" colspan="3">-</td>
+          </tr>
+          <tr>
+            <td>总氮(TN)</td>
+            <td id="tnResult" colspan="3">-</td>
+          </tr>
+          <tr>
+            <td>COD</td>
+            <td id="codResult" colspan="3">-</td>
+          </tr>
+        </table>
+        <br>
+        <button type="button" id="copyTableBtn">复制表格</button>
+        <button type="button" id="downloadTableBtn">下载表格</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>版权所有 © xxx 所有</p>
+    <p>2026年 | 版本号：V1.0.0</p>
+  </div>
+
+  <script>
+
+    // 获取当前检测指标
+    const currentIndicator = localStorage.getItem('currentIndicator') || 'tp';
+    const indicatorTitle = document.getElementById('indicatorTitle');
+
+    // 根据检测指标设置标题
+    switch (currentIndicator) {
+      case 'tp':
+        indicatorTitle.textContent = '总磷(TP)检测';
+        break;
+      case 'tn':
+        indicatorTitle.textContent = '总氮(TN)检测';
+        break;
+      case 'cod':
+        indicatorTitle.textContent = '化学需氧量(COD)检测';
+        break;
+      default:
+        indicatorTitle.textContent = '总磷(TP)检测';
+    }
+
+    const uploadSection = document.getElementById("uploadSection");
+    const uploadInput = document.getElementById("upload-input");
+    const imagePreview = document.getElementById("imagePreview");
+    const resultPanel = document.getElementById("resultPanel")
+    const calibrateBtn = document.getElementById("calibrateBtn")
+    const calibrateBtn2 = document.getElementById("calibrateBtn2")
+    const continueBtn = document.getElementById("continueBtn")
+    const outputTableBtn = document.getElementById("outputTableBtn")
+    const tableModal = document.getElementById("tableModal")
+    const closeBtn = document.querySelector(".close")
+    const copyTableBtn = document.getElementById("copyTableBtn")
+    const downloadTableBtn = document.getElementById("downloadTableBtn")
+    const projectNameInput = document.getElementById("projectName")
+    const afterUploadInstruction = document.getElementById("afterUploadInstruction");
+    const imageActions = document.getElementById("imageActions");
+
+    // 点击上传区域时触发文件输入
+    uploadSection.addEventListener('click', function () {
+      uploadInput.click();
+    });
+
+    // 拖拽上传相关事件
+    uploadSection.addEventListener('dragover', function (e) {
+      e.preventDefault();
+      uploadSection.classList.add('drag-over');
+    });
+
+    uploadSection.addEventListener('dragleave', function (e) {
+      e.preventDefault();
+      uploadSection.classList.remove('drag-over');
+    });
+
+    uploadSection.addEventListener('drop', function (e) {
+      e.preventDefault();
+      uploadSection.classList.remove('drag-over');
+
+      if (e.dataTransfer.files.length) {
+        handleFileUpload(e.dataTransfer.files[0]);
+      }
+    });
+
+    // 不同指标的比色卡
+    const colorCards = {
+      tp: [  // 总磷(TP)
+        { value: "0–0.1 mg/L", range: [250, 250, 250], recommendation: "极低磷水平，水体贫营养或较健康；一般无需处理，保持现有管理，避免农业面源污染与含磷洗涤剂入水体" },
+        { value: "0.1–0.2 mg/L", range: [220, 220, 220], recommendation: "低磷水平，水体基本健康；建议持续监测，控制生活污水、农业径流等磷输入" },
+        { value: "0.2–0.3 mg/L", range: [190, 190, 190], recommendation: "接近部分处理工艺上限，富营养化风险上升；加强监测，检查污水系统，减少含磷排放" },
+        { value: "0.3–0.5 mg/L", range: [160, 160, 160], recommendation: "超生态安全阈值，富营养化风险明显；采取控磷措施，优化污水工艺、减少农业施肥" },
+        { value: "0.5–1.0 mg/L", range: [130, 130, 130], recommendation: "磷污染较明显；开展污染源排查，强化化学/生物除磷，减少外源输入" },
+        { value: "1.0–1.5 mg/L", range: [100, 100, 100], recommendation: "较高磷污染；立即治理，加强污水、截污、控工业/养殖排放" },
+        { value: "1.5–2.0 mg/L", range: [70, 70, 70], recommendation: "严重磷污染；系统治理，深度除磷、面源污染控制、水体修复" }
+      ],
+      tn: [  // 总氮(TN) - 示例数据
+        { value: "0–0.5 mg/L", range: [255, 255, 200], recommendation: "极低氮水平，水体贫营养；保持现有管理措施" },
+        { value: "0.5–1.0 mg/L", range: [255, 240, 150], recommendation: "低氮水平，水体基本健康；建议持续监测" },
+        { value: "1.0–1.5 mg/L", range: [255, 200, 100], recommendation: "氮含量适中，注意潜在富营养化风险；加强监测" },
+        { value: "1.5–2.5 mg/L", range: [255, 150, 50], recommendation: "氮含量偏高，存在富营养化风险；采取控氮措施" },
+        { value: "2.5–5.0 mg/L", range: [255, 100, 0], recommendation: "氮污染较明显；开展污染源排查" },
+        { value: "5.0–10.0 mg/L", range: [200, 70, 0], recommendation: "较高氮污染；立即治理" },
+        { value: "10.0–20.0 mg/L", range: [150, 40, 0], recommendation: "严重氮污染；系统治理" }
+      ],
+      cod: [  // COD - 示例数据
+        { value: "0–10 mg/L", range: [240, 255, 240], recommendation: "极低COD值，水质优良；保持现有保护措施" },
+        { value: "10–25 mg/L", range: [200, 255, 200], recommendation: "低COD值，水质良好；建议持续监测" },
+        { value: "25–50 mg/L", range: [150, 255, 150], recommendation: "COD值正常，注意潜在污染风险；加强监测" },
+        { value: "50–100 mg/L", range: [100, 255, 100], recommendation: "COD值偏高，存在有机污染风险；采取控污措施" },
+        { value: "100–200 mg/L", range: [50, 255, 50], recommendation: "有机污染较明显；开展污染源排查" },
+        { value: "200–300 mg/L", range: [0, 200, 0], recommendation: "较高有机污染；立即治理" },
+        { value: "300–500 mg/L", range: [0, 150, 0], recommendation: "严重有机污染；系统治理" }
+      ]
+    };
+
+    // 标准灰度色块 - 灰度0和100
+    const standardGrays = [
+      { gray: 0, rgb: [0, 0, 0] },      // 理想黑色
+      { gray: 100, rgb: [255, 255, 255] }  // 理想白色
+    ]
+
+    let imgLoaded = false
+    let calibrationData = null
+    let currentResult = null
+    let currentIndicatorResult = null
+
+    // 处理文件上传的函数
+    function handleFileUpload(file) {
+      if (!file || !file.type.match('image.*')) {
+        alert('请选择一个有效的图片文件！');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        imagePreview.src = e.target.result;
+        imagePreview.style.display = "block";
+        imgLoaded = true;
+
+        // 隐藏上传区域
+        uploadSection.style.display = "none";
+
+        // 显示上传后的操作提示
+        afterUploadInstruction.style.display = "block";
+
+        // 显示图像操作按钮
+        imageActions.style.display = "block";
+
+        // 添加点击事件到图片预览
+        imagePreview.onclick = function (event) {
+          if (!imgLoaded) return;
+          if (calibrationData === null) {
+            alert("请先点击'校准图像'按钮，然后选择灰度0和灰度100色块进行校准");
+            return;
+          }
+
+          const rect = imagePreview.getBoundingClientRect();
+          const x = Math.floor((event.clientX - rect.left) * (imagePreview.naturalWidth / rect.width));
+          const y = Math.floor((event.clientY - rect.top) * (imagePreview.naturalHeight / rect.height));
+
+          // 创建一个临时canvas来获取像素颜色
+          const tempCanvas = document.createElement('canvas');
+          const tempCtx = tempCanvas.getContext('2d');
+          tempCanvas.width = imagePreview.naturalWidth;
+          tempCanvas.height = imagePreview.naturalHeight;
+          tempCtx.drawImage(imagePreview, 0, 0);
+
+          // 获取点击点周围的平均颜色
+          const avgColor = getAverageColorFromImage(tempCtx, x, y, 10);
+
+          // 如果已经校准，应用校正
+          const correctedColor = calibrationData ? applyCalibration(avgColor, calibrationData) : avgColor
+
+          showColor(correctedColor);
+          resultPanel.style.display = "block";
+
+          // 隐藏上传后的操作提示
+          afterUploadInstruction.style.display = "none";
+
+          currentResult = correctedColor;
+        };
+      };
+      reader.readAsDataURL(file);
+    }
+
+    uploadInput.onchange = function (e) {
+      const file = e.target.files[0]
+      if (!file) return
+
+      handleFileUpload(file)
+    }
+
+    // 点击校准按钮
+    calibrateBtn.addEventListener("click", function () {
+      if (!imgLoaded) {
+        alert("请先上传图片");
+        return;
+      }
+
+      alert("请依次点击图片中的灰度0和灰度100色块进行校准");
+
+      let grayColors = [];
+
+      // 临时的点击事件监听器用于选择灰度色块
+      const tempClickListener = function (event) {
+        if (grayColors.length >= 2) {
+          // 移除临时监听器
+          imagePreview.removeEventListener("click", tempClickListener);
+          return;
+        }
+
+        if (!imgLoaded) return
+
+        const rect = imagePreview.getBoundingClientRect();
+        const x = Math.floor((event.clientX - rect.left) * (imagePreview.naturalWidth / rect.width));
+        const y = Math.floor((event.clientY - rect.top) * (imagePreview.naturalHeight / rect.height));
+
+        // 创建一个临时canvas来获取像素颜色
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCanvas.width = imagePreview.naturalWidth;
+        tempCanvas.height = imagePreview.naturalHeight;
+        tempCtx.drawImage(imagePreview, 0, 0);
+
+        const color = getAverageColorFromImage(tempCtx, x, y, 10);
+        grayColors.push(color);
+
+        if (grayColors.length === 1) {
+          alert("已选择灰度0色块，请继续点击灰度100色块");
+        } else if (grayColors.length === 2) {
+          // 完成校准计算
+          calibrationData = calculateCalibration([grayColors[0], grayColors[1]]);
+          document.getElementById("calibrationStatus").textContent = "已校准";
+          document.getElementById("calibrationStatus2").textContent = "已校准";
+          alert("校准完成！现在可以在样品区域点击以获取校准后的检测结果");
+
+          // 移除临时监听器
+          imagePreview.removeEventListener("click", tempClickListener);
+        }
+      };
+
+      imagePreview.addEventListener("click", tempClickListener);
+    });
+
+    // 点击检测颜色
+    canvas.addEventListener("click", function (e) {
+      if (!imgLoaded) return;
+      if (calibrationData === null) {
+        alert("请先点击'校准图像'按钮，然后选择灰度0和灰度100色块进行校准");
+        return;
+      }
+
+      const rect = canvas.getBoundingClientRect()
+      const x = Math.floor((e.clientX - rect.left) * (canvas.width / rect.width))
+      const y = Math.floor((e.clientY - rect.top) * (canvas.height / rect.height))
+
+      const color = getAverageColor(x, y, 10)
+
+      // 如果已经校准，应用校正
+      const correctedColor = calibrationData ? applyCalibration(color, calibrationData) : color
+
+      showColor(correctedColor)
+      resultPanel.style.display = "block"
+
+      // 隐藏上传后的操作提示
+      afterUploadInstruction.style.display = "none";
+
+      currentResult = correctedColor
+    })
+
+    // 计算校准参数
+    function calculateCalibration(measuredGrays) {
+      // measuredGrays 是用户点击得到的灰度色块的实际测量值
+      const measuredDark = measuredGrays[0]; // 对应标准黑 [0,0,0]
+      const measuredLight = measuredGrays[1]; // 对应标准白 [255,255,255]
+
+      // 计算每个通道的校正参数 (仿射变换 y = ax + b)
+      const calculateCoefficients = (measuredDarkVal, measuredLightVal, idealDarkVal, idealLightVal) => {
+        // 使用两点确定直线: y = ax + b
+        const a = (idealLightVal - idealDarkVal) / (measuredLightVal - measuredDarkVal);
+        const b = idealDarkVal - a * measuredDarkVal;
+        return { a, b };
+      };
+
+      const rCoeffs = calculateCoefficients(measuredDark[0], measuredLight[0], 0, 255);
+      const gCoeffs = calculateCoefficients(measuredDark[1], measuredLight[1], 0, 255);
+      const bCoeffs = calculateCoefficients(measuredDark[2], measuredLight[2], 0, 255);
+
+      return {
+        r: rCoeffs,
+        g: gCoeffs,
+        b: bCoeffs
+      };
+    }
+
+    // 应用校准到颜色值
+    function applyCalibration(color, calibration) {
+      const [r, g, b] = color;
+
+      // 应用校正公式: corrected = a * measured + b
+      let correctedR = Math.round(calibration.r.a * r + calibration.r.b);
+      let correctedG = Math.round(calibration.g.a * g + calibration.g.b);
+      let correctedB = Math.round(calibration.b.a * b + calibration.b.b);
+
+      // 限制值在 0-255 范围内
+      correctedR = Math.max(0, Math.min(255, correctedR));
+      correctedG = Math.max(0, Math.min(255, correctedG));
+      correctedB = Math.max(0, Math.min(255, correctedB));
+
+      return [correctedR, correctedG, correctedB];
+    }
+
+    // 从图片上下文获取平均颜色
+    function getAverageColorFromImage(ctx, cx, cy, size) {
+      let r = 0, g = 0, b = 0, count = 0;
+
+      for (let x = -size; x <= size; x++) {
+        for (let y = -size; y <= size; y++) {
+          const px = cx + x;
+          const py = cy + y;
+
+          if (px >= 0 && py >= 0 && px < ctx.canvas.width && py < ctx.canvas.height) {
+            const data = ctx.getImageData(px, py, 1, 1).data;
+            r += data[0];
+            g += data[1];
+            b += data[2];
+            count++;
+          }
+        }
+      }
+
+      return [
+        Math.floor(r / count),
+        Math.floor(g / count),
+        Math.floor(b / count)
+      ];
+    }
+
+    // RGB转HEX
+    function rgbToHex(r, g, b) {
+      return "#" + [r, g, b].map(x => {
+        const hex = x.toString(16)
+        return hex.length === 1 ? "0" + hex : hex
+      }).join("")
+    }
+
+    // 计算颜色距离
+    function colorDistance(c1, c2) {
+      return Math.sqrt(
+        (c1[0] - c2[0]) ** 2 +
+        (c1[1] - c2[1]) ** 2 +
+        (c1[2] - c2[2]) ** 2
+      )
+    }
+
+    // 匹配当前指标的比色卡
+    function findRange(rgb) {
+      const card = colorCards[currentIndicator] || colorCards.tp;
+
+      let minDist = Infinity
+      let matchedIndex = -1
+
+      card.forEach((c, i) => {
+        const dist = colorDistance(rgb, c.range)
+        if (dist < minDist) {
+          minDist = dist
+          matchedIndex = i
+        }
+      })
+
+      if (matchedIndex !== -1) {
+        currentIndicatorResult = {
+          indicator: currentIndicator,
+          value: card[matchedIndex].value,
+          recommendation: card[matchedIndex].recommendation
+        };
+        return {
+          value: card[matchedIndex].value,
+          recommendation: card[matchedIndex].recommendation
+        }
+      }
+
+      return { value: "-", recommendation: "-" }
+    }
+
+    // 显示结果
+    function showColor(rgb) {
+      const [r, g, b] = rgb
+
+      document.getElementById("rgb").innerText = `RGB: ${r}, ${g}, ${b}`
+      const hex = rgbToHex(r, g, b)
+      document.getElementById("hex").innerText = `HEX: ${hex}`
+      document.getElementById("colorBox").style.background = hex
+
+      const result = findRange(rgb)
+      document.getElementById("range").innerText = `${getIndicatorName(currentIndicator)}: ${result.value}`
+      document.getElementById("recommendation").innerText = `建议: ${result.recommendation}`
+    }
+
+    // 获取指标名称
+    function getIndicatorName(indicator) {
+      switch (indicator) {
+        case 'tp': return '总磷(TP)';
+        case 'tn': return '总氮(TN)';
+        case 'cod': return '化学需氧量(COD)';
+        default: return '总磷(TP)';
+      }
+    }
+
+    // 继续检测按钮
+    continueBtn.addEventListener("click", function () {
+      resultPanel.style.display = "none"
+      // 重新显示上传后的操作提示，因为用户可能想要检测另一个区域
+      afterUploadInstruction.style.display = "block";
+    })
+
+    // 第二个校准按钮事件
+    calibrateBtn2.addEventListener("click", function () {
+      calibrateBtn.click();  // 触发第一个校准按钮的事件
+    });
+
+    // 输出表格按钮
+    outputTableBtn.addEventListener("click", function () {
+      // 自动生成项目名称
+      const now = new Date()
+      projectNameInput.value = `${getIndicatorName(currentIndicator)}_${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}`
+
+      // 设置检测时间
+      document.getElementById("detectTime").textContent = now.toLocaleString('sv-SE')
+
+      // 设置当前指标结果
+      if (currentIndicatorResult) {
+        const resultText = `${currentIndicatorResult.value} - ${currentIndicatorResult.recommendation}`;
+        switch (currentIndicatorResult.indicator) {
+          case 'tp':
+            document.getElementById("tpResult").textContent = resultText;
+            break;
+          case 'tn':
+            document.getElementById("tnResult").textContent = resultText;
+            break;
+          case 'cod':
+            document.getElementById("codResult").textContent = resultText;
+            break;
+        }
+      }
+
+      tableModal.style.display = "block"
+    })
+
+    // 关闭模态框
+    closeBtn.onclick = function () {
+      tableModal.style.display = "none"
+    }
+
+    window.onclick = function (event) {
+      if (event.target == tableModal) {
+        tableModal.style.display = "none"
+      }
+    }
+
+    // 复制表格
+    copyTableBtn.addEventListener("click", function () {
+      alert("表格内容已复制到剪贴板")
+      // 这里可以实现实际的复制功能
+    })
+
+    // 下载表格
+    downloadTableBtn.addEventListener("click", function () {
+      alert("正在下载检测报告...")
+      // 这里可以实现实际的下载功能
+    })
+
+  </script>
+
+</body>
+
+</html>
