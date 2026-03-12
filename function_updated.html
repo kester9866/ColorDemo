@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aquacheck功能页 - 水体智能检测</title>
+  <style>
+    :root {
+      --bg: #eff8fc;
+      --surface: rgba(255,255,255,.9);
+      --surface-strong: #fff;
+      --line: rgba(23, 125, 220, .10);
+      --text: #16324a;
+      --muted: #617c92;
+      --primary: #177ddc;
+      --primary-dark: #0f5ea8;
+      --success: #15a154;
+      --success-soft: #ebf9f1;
+      --warning: #ffae1f;
+      --danger: #eb5d6d;
+      --shadow: 0 16px 36px rgba(21, 67, 107, .12);
+      --radius: 22px;
+      --max: 1240px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 10%, rgba(23,125,220,.14), transparent 24%),
+        radial-gradient(circle at 100% 0%, rgba(21,161,84,.12), transparent 18%),
+        linear-gradient(180deg, #f6fbff 0%, #ecf5fb 100%);
+      min-height: 100vh;
+    }
+
+    .page {
+      width: min(var(--max), calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 36px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: center;
+      background: linear-gradient(135deg, rgba(255,255,255,.96), rgba(237,247,255,.9));
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 24px 28px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .header h1 {
+      margin: 0 0 8px;
+      font-size: clamp(24px, 4vw, 34px);
+    }
+
+    .header p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 820px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(23,125,220,.1);
+      color: var(--primary-dark);
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .back-btn, .btn, .ghost-btn, .download-btn {
+      border: none;
+      cursor: pointer;
+      transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease;
+    }
+
+    .back-btn:hover, .btn:hover, .ghost-btn:hover, .download-btn:hover {
+      transform: translateY(-1px);
+      opacity: .96;
+    }
+
+    .back-btn {
+      background: #ffffff;
+      border: 1px solid var(--line);
+      color: var(--primary-dark);
+      padding: 12px 16px;
+      border-radius: 14px;
+      box-shadow: 0 8px 18px rgba(21, 67, 107, .08);
+      font-weight: 700;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+
+    .panel h2, .panel h3 {
+      margin-top: 0;
+    }
+
+    .title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .subtle {
+      color: var(--muted);
+      line-height: 1.75;
+      font-size: 14px;
+    }
+
+    .instruction-box {
+      background: linear-gradient(180deg, #ffffff, #f4fbff);
+    }
+
+    .tip {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      background: #f7fbff;
+      border: 1px solid rgba(23,125,220,.08);
+      border-radius: 16px;
+      padding: 14px;
+      margin-top: 14px;
+    }
+
+    .tip-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(23,125,220,.12);
+      color: var(--primary-dark);
+      font-weight: 800;
+      flex: 0 0 30px;
+    }
+
+    .color-card {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .swatch-card {
+      background: #fff;
+      border: 1px solid rgba(23,125,220,.08);
+      border-radius: 18px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .swatch {
+      width: 100%;
+      height: 84px;
+      border-radius: 14px;
+      margin-bottom: 10px;
+      border: 1px solid rgba(0,0,0,.12);
+    }
+
+    .tools {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn, .ghost-btn, .download-btn {
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      box-shadow: 0 10px 18px rgba(23,125,220,.24);
+    }
+
+    .ghost-btn {
+      background: #fff;
+      color: var(--primary-dark);
+      border: 1px solid rgba(23,125,220,.12);
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #f2f7fb;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #a7b7c7;
+    }
+
+    .status.active {
+      background: rgba(21,161,84,.10);
+      color: #117a42;
+    }
+
+    .status.active .status-dot {
+      background: var(--success);
+    }
+
+    .viewer {
+      display: grid;
+      gap: 16px;
+    }
+
+    .upload-card {
+      background: linear-gradient(180deg, #ffffff 0%, #f5fbff 100%);
+      border: 2px dashed rgba(23,125,220,.35);
+      border-radius: 22px;
+      min-height: 220px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 20px;
+      cursor: pointer;
+      transition: border-color .2s ease, transform .2s ease, background .2s ease;
+    }
+
+    .upload-card:hover, .upload-card.drag-over {
+      border-color: var(--primary);
+      background: #eef7ff;
+      transform: translateY(-1px);
+    }
+
+    #upload-input { display: none; }
+
+    .upload-icon {
+      font-size: 50px;
+      margin-bottom: 12px;
+    }
+
+    .upload-title {
+      margin: 0 0 8px;
+      font-size: 22px;
+    }
+
+    .upload-desc {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .preview-shell {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .preview-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .image-stage {
+      position: relative;
+      background: #f5fbff;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(23,125,220,.08);
+      min-height: 260px;
+      display: grid;
+      place-items: center;
+    }
+
+    #imagePreview {
+      max-width: 100%;
+      max-height: 72vh;
+      display: block;
+      cursor: crosshair;
+      object-fit: contain;
+      user-select: none;
+    }
+
+    .overlay-note {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 2;
+      background: rgba(20, 50, 74, .76);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.6;
+      max-width: 360px;
+      display: none;
+    }
+
+    .preview-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .result-panel {
+      display: none;
+      background: linear-gradient(180deg, #ffffff 0%, #f4fbff 100%);
+      border-radius: 24px;
+      border: 1px solid rgba(21,161,84,.12);
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .color-box {
+      width: 130px;
+      height: 130px;
+      border-radius: 20px;
+      border: 1px solid rgba(20,50,74,.18);
+      box-shadow: inset 0 0 0 4px rgba(255,255,255,.32);
+      background: #fff;
+      margin: 0 auto;
+    }
+
+    .kv-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .kv {
+      background: #fff;
+      border: 1px solid rgba(23,125,220,.08);
+      border-radius: 16px;
+      padding: 14px;
+      min-height: 84px;
+    }
+
+    .kv .label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .kv .value {
+      font-weight: 700;
+      line-height: 1.7;
+      word-break: break-word;
+    }
+
+    .highlight {
+      background: var(--success-soft);
+      border: 1px solid rgba(21,161,84,.16);
+    }
+
+    .result-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      background: rgba(10, 25, 41, .45);
+      z-index: 1000;
+      padding: 18px;
+      overflow: auto;
+    }
+
+    .modal-content {
+      width: min(1040px, 100%);
+      margin: 28px auto;
+      background: #fff;
+      border-radius: 26px;
+      box-shadow: 0 28px 60px rgba(8, 32, 59, .24);
+      overflow: hidden;
+      border: 1px solid rgba(23,125,220,.08);
+    }
+
+    .modal-head {
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      background: linear-gradient(180deg, #fcfeff 0%, #f2f8fd 100%);
+      border-bottom: 1px solid rgba(23,125,220,.08);
+      flex-wrap: wrap;
+    }
+
+    .modal-head h2 {
+      margin: 0;
+    }
+
+    .close {
+      font-size: 28px;
+      line-height: 1;
+      background: transparent;
+      border: none;
+      color: #6b8195;
+      cursor: pointer;
+    }
+
+    .modal-body {
+      padding: 22px 24px 26px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 18px;
+      border: 1px solid rgba(23,125,220,.10);
+    }
+
+    th, td {
+      border: 1px solid rgba(23,125,220,.08);
+      padding: 12px 14px;
+      text-align: left;
+      vertical-align: top;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    th {
+      background: #f5fbff;
+      color: var(--primary-dark);
+      width: 130px;
+      white-space: nowrap;
+    }
+
+    .input-cell input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid rgba(23,125,220,.14);
+      border-radius: 12px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .input-cell input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(23,125,220,.1);
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    .download-btn {
+      background: linear-gradient(135deg, var(--success), #0f8c48);
+      color: #fff;
+      box-shadow: 0 10px 18px rgba(21,161,84,.22);
+    }
+
+    .footer {
+      margin-top: 20px;
+      padding: 18px 22px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.88);
+      border: 1px solid rgba(23,125,220,.08);
+      box-shadow: var(--shadow);
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 14px;
+    }
+
+    @media (max-width: 1080px) {
+      .layout { grid-template-columns: 1fr; }
+      .result-grid { grid-template-columns: 1fr; }
+      .color-box { margin: 0; }
+    }
+
+    @media (max-width: 640px) {
+      .page { width: min(100% - 18px, var(--max)); padding-top: 14px; }
+      .header, .panel, .preview-shell, .result-panel { padding: 18px; border-radius: 20px; }
+      .modal-body, .modal-head { padding-left: 16px; padding-right: 16px; }
+      .kv-grid, .color-card { grid-template-columns: 1fr; }
+      .footer { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="header">
+      <div>
+        <div class="chip" id="pageChip">Aquacheck · 指标检测</div>
+        <h1 id="indicatorTitle">总磷(TP)检测</h1>
+        <p>请在自然光下，使用相机拍摄检测完成后的试剂盒，并点击上传文件。上传后可点击样品区域进行识别，系统将输出结果与建议，并支持表格导出。</p>
+      </div>
+      <div class="header-actions">
+        <button class="back-btn" id="backBtn">← 返回首页</button>
+      </div>
+    </section>
+
+    <section class="layout">
+      <aside class="panel instruction-box">
+        <div class="title-row">
+          <h2>检测说明</h2>
+          <span class="status" id="detectStatus"><span class="status-dot"></span>等待上传</span>
+        </div>
+        <div class="subtle">
+          当前页面支持图片上传、局部颜色提取、结果判断、表格预览、复制与下载。
+        </div>
+
+        <div class="tip">
+          <div class="tip-icon">1</div>
+          <div class="subtle">请确保拍摄画面清晰、试剂盒与参考色纸完整入镜，尽量避免阴影、反光和过曝。</div>
+        </div>
+        <div class="tip">
+          <div class="tip-icon">2</div>
+          <div class="subtle">支持 png、jpg、jpeg，预留 heif、heic 手机格式兼容提示；如浏览器不支持 HEIC/HEIF 解码，可先转为 JPG 上传。</div>
+        </div>
+        <div class="tip">
+          <div class="tip-icon">3</div>
+          <div class="subtle">点击“校准图像”后，依次点击照片中的深色参考块和浅色参考块，再点击样品区域获取检测值。</div>
+        </div>
+
+        <h3 style="margin-top:22px;">本地参考色纸</h3>
+        <div class="color-card">
+          <div class="swatch-card">
+            <div class="swatch" style="background:#111111;"></div>
+            <strong>灰度 0%</strong>
+            <div class="subtle">深色参考块</div>
+          </div>
+          <div class="swatch-card">
+            <div class="swatch" style="background:#ffffff;"></div>
+            <strong>灰度 100%</strong>
+            <div class="subtle">浅色参考块</div>
+          </div>
+        </div>
+
+        <div class="tools">
+          <div class="action-row">
+            <button class="btn" id="calibrateBtn">校准图像</button>
+            <button class="ghost-btn" id="resetBtn">重置本次检测</button>
+          </div>
+          <div class="action-row">
+            <span class="status" id="calibrationStatus"><span class="status-dot"></span>未校准</span>
+          </div>
+        </div>
+      </aside>
+
+      <section class="viewer">
+        <div class="upload-card" id="uploadSection">
+          <div>
+            <div class="upload-icon">📷</div>
+            <h3 class="upload-title">上传或拍摄检测图片</h3>
+            <p class="upload-desc">点击此处上传图片文件，或直接拖拽图片至此区域。<br>支持：png / jpg / jpeg，预留兼容：heif / heic。</p>
+          </div>
+          <input type="file" id="upload-input" accept="image/png,image/jpeg,image/jpg,image/heic,image/heif,image/*" capture="environment" />
+        </div>
+
+        <div class="preview-shell" id="previewShell">
+          <div class="preview-top">
+            <div>
+              <h3 style="margin:0 0 6px;">图片展示区</h3>
+              <div class="subtle" id="previewHint">图片已上传，请先完成校准，再点击样品检测区域。</div>
+            </div>
+            <div class="action-row">
+              <button class="ghost-btn" id="reuploadBtn">重新上传</button>
+              <button class="btn" id="captureBtn">上传</button>
+            </div>
+          </div>
+
+          <div class="image-stage">
+            <div class="overlay-note" id="overlayNote">请先点击“校准图像”，再依次选择深色参考块与浅色参考块。</div>
+            <img id="imagePreview" alt="检测图片预览" />
+          </div>
+
+          <div class="preview-actions">
+            <div class="subtle">识别方式：点击图片目标区域，系统将提取该区域平均 RGB 颜色并匹配当前指标的比色规则。</div>
+            <div class="status" id="imageReadyStatus"><span class="status-dot"></span>图片待分析</div>
+          </div>
+        </div>
+
+        <div class="result-panel" id="resultPanel">
+          <div class="title-row">
+            <h2 style="margin:0;">检测结果</h2>
+            <span class="status active"><span class="status-dot"></span>已生成结果</span>
+          </div>
+
+          <div class="result-grid">
+            <div class="color-box" id="colorBox"></div>
+            <div>
+              <div class="kv-grid">
+                <div class="kv">
+                  <div class="label">当前指标</div>
+                  <div class="value" id="resultIndicator">-</div>
+                </div>
+                <div class="kv">
+                  <div class="label">RGB 色值</div>
+                  <div class="value" id="rgb">-</div>
+                </div>
+                <div class="kv">
+                  <div class="label">HEX 色值</div>
+                  <div class="value" id="hex">-</div>
+                </div>
+                <div class="kv highlight">
+                  <div class="label">检测值</div>
+                  <div class="value" id="range">-</div>
+                </div>
+                <div class="kv highlight" style="grid-column: 1 / -1;">
+                  <div class="label">处理建议</div>
+                  <div class="value" id="recommendation">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="result-actions">
+            <button class="ghost-btn" id="continueBtn">继续检测</button>
+            <button class="download-btn" id="outputTableBtn">输出表格</button>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <div class="modal" id="tableModal">
+      <div class="modal-content">
+        <div class="modal-head">
+          <div>
+            <h2>检测结果表格预览</h2>
+            <div class="subtle">项目名称可手动修改；未输入时将按当前指标与时间自动生成。下载文件名与项目名称保持一致。</div>
+          </div>
+          <button class="close" id="closeModalBtn" aria-label="关闭弹窗">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <table id="resultTable">
+            <tbody>
+              <tr>
+                <th>项目名称</th>
+                <td class="input-cell"><input type="text" id="projectName" placeholder="系统自动生成" /></td>
+                <th>检测时间</th>
+                <td id="detectTime">-</td>
+              </tr>
+              <tr>
+                <th>检测位置</th>
+                <td class="input-cell"><input type="text" id="detectLocation" value="未知" placeholder="请输入检测位置" /></td>
+                <th>检测人员</th>
+                <td class="input-cell"><input type="text" id="detectUser" placeholder="请输入检测人员" /></td>
+              </tr>
+              <tr>
+                <th colspan="4">指标 &amp; 范围(单位) &amp; 建议</th>
+              </tr>
+              <tr>
+                <th>总磷(TP)</th>
+                <td colspan="3" id="tpResult">-</td>
+              </tr>
+              <tr>
+                <th>总氮(TN)</th>
+                <td colspan="3" id="tnResult">-</td>
+              </tr>
+              <tr>
+                <th>COD</th>
+                <td colspan="3" id="codResult">-</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="modal-actions">
+            <button class="ghost-btn" id="copyTableBtn">复制表格</button>
+            <button class="download-btn" id="downloadTableBtn">下载表格</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div>版权归 © xxx 所有</div>
+      <div>2026年</div>
+      <div>版本号：V1.0.0</div>
+    </footer>
+  </main>
+
+  <script>
+    const indicatorMeta = {
+      tp: {
+        title: '总磷(TP)检测',
+        short: 'TP',
+        chip: 'Aquacheck · 总磷检测',
+        autoPrefix: '总磷检测',
+        cards: [
+          { value: "0–0.1 mg/L", range: [250, 250, 250], recommendation: "极低磷水平，水体贫营养或较健康；一般无需处理，保持现有管理，避免农业面源污染与含磷洗涤剂入水体" },
+          { value: "0.1–0.2 mg/L", range: [220, 220, 220], recommendation: "低磷水平，水体基本健康；建议持续监测，控制生活污水、农业径流等磷输入" },
+          { value: "0.2–0.3 mg/L", range: [190, 190, 190], recommendation: "接近部分处理工艺上限，富营养化风险上升；加强监测，检查污水系统，减少含磷排放" },
+          { value: "0.3–0.5 mg/L", range: [160, 160, 160], recommendation: "超生态安全阈值，富营养化风险明显；采取控磷措施，优化污水工艺、减少农业施肥" },
+          { value: "0.5–1.0 mg/L", range: [130, 130, 130], recommendation: "磷污染较明显；开展污染源排查，强化化学/生物除磷，减少外源输入" },
+          { value: "1.0–1.5 mg/L", range: [100, 100, 100], recommendation: "较高磷污染；立即治理，加强污水、截污、控工业/养殖排放" },
+          { value: "1.5–2.0 mg/L", range: [70, 70, 70], recommendation: "严重磷污染；系统治理，深度除磷、面源污染控制、水体修复" }
+        ]
+      },
+      tn: {
+        title: '总氮(TN)检测',
+        short: 'TN',
+        chip: 'Aquacheck · 总氮检测',
+        autoPrefix: '总氮检测',
+        cards: [
+          { value: "0–0.5 mg/L", range: [255, 255, 200], recommendation: "极低氮水平，水体贫营养；保持现有管理措施" },
+          { value: "0.5–1.0 mg/L", range: [255, 240, 150], recommendation: "低氮水平，水体基本健康；建议持续监测" },
+          { value: "1.0–1.5 mg/L", range: [255, 200, 100], recommendation: "氮含量适中，注意潜在富营养化风险；加强监测" },
+          { value: "1.5–2.5 mg/L", range: [255, 150, 50], recommendation: "氮含量偏高，存在富营养化风险；采取控氮措施" },
+          { value: "2.5–5.0 mg/L", range: [255, 100, 0], recommendation: "氮污染较明显；开展污染源排查" },
+          { value: "5.0–10.0 mg/L", range: [200, 70, 0], recommendation: "较高氮污染；立即治理" },
+          { value: "10.0–20.0 mg/L", range: [150, 40, 0], recommendation: "严重氮污染；系统治理" }
+        ]
+      },
+      cod: {
+        title: '化学需氧量(COD)检测',
+        short: 'COD',
+        chip: 'Aquacheck · COD检测',
+        autoPrefix: 'COD检测',
+        cards: [
+          { value: "0–10 mg/L", range: [240, 255, 240], recommendation: "极低COD值，水质优良；保持现有保护措施" },
+          { value: "10–25 mg/L", range: [200, 255, 200], recommendation: "低COD值，水质良好；建议持续监测" },
+          { value: "25–50 mg/L", range: [150, 255, 150], recommendation: "COD值正常，注意潜在污染风险；加强监测" },
+          { value: "50–100 mg/L", range: [100, 255, 100], recommendation: "COD值偏高，存在有机污染风险；采取控污措施" },
+          { value: "100–200 mg/L", range: [50, 255, 50], recommendation: "有机污染较明显；开展污染源排查" },
+          { value: "200–300 mg/L", range: [0, 200, 0], recommendation: "较高有机污染；立即治理" },
+          { value: "300–500 mg/L", range: [0, 150, 0], recommendation: "严重有机污染；系统治理" }
+        ]
+      }
+    };
+
+    const currentIndicator = localStorage.getItem('currentIndicator') || 'tp';
+    const currentMeta = indicatorMeta[currentIndicator] || indicatorMeta.tp;
+
+    const indicatorTitle = document.getElementById('indicatorTitle');
+    const pageChip = document.getElementById('pageChip');
+    const uploadSection = document.getElementById('uploadSection');
+    const uploadInput = document.getElementById('upload-input');
+    const previewShell = document.getElementById('previewShell');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewHint = document.getElementById('previewHint');
+    const overlayNote = document.getElementById('overlayNote');
+    const resultPanel = document.getElementById('resultPanel');
+    const colorBox = document.getElementById('colorBox');
+    const rgbText = document.getElementById('rgb');
+    const hexText = document.getElementById('hex');
+    const rangeText = document.getElementById('range');
+    const recommendationText = document.getElementById('recommendation');
+    const resultIndicator = document.getElementById('resultIndicator');
+    const detectStatus = document.getElementById('detectStatus');
+    const imageReadyStatus = document.getElementById('imageReadyStatus');
+    const calibrateBtn = document.getElementById('calibrateBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const continueBtn = document.getElementById('continueBtn');
+    const outputTableBtn = document.getElementById('outputTableBtn');
+    const reuploadBtn = document.getElementById('reuploadBtn');
+    const captureBtn = document.getElementById('captureBtn');
+    const backBtn = document.getElementById('backBtn');
+    const calibrationStatus = document.getElementById('calibrationStatus');
+    const tableModal = document.getElementById('tableModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const projectNameInput = document.getElementById('projectName');
+    const detectTime = document.getElementById('detectTime');
+    const tpResult = document.getElementById('tpResult');
+    const tnResult = document.getElementById('tnResult');
+    const codResult = document.getElementById('codResult');
+    const copyTableBtn = document.getElementById('copyTableBtn');
+    const downloadTableBtn = document.getElementById('downloadTableBtn');
+
+    let imgLoaded = false;
+    let calibrationData = null;
+    let selectedCalibrationPoints = [];
+    let currentResult = null;
+    let resultStore = {
+      tp: null,
+      tn: null,
+      cod: null
+    };
+
+    indicatorTitle.textContent = currentMeta.title;
+    pageChip.textContent = currentMeta.chip;
+    resultIndicator.textContent = currentMeta.title;
+
+    function setStatus(el, text, active = false) {
+      el.classList.toggle('active', active);
+      el.innerHTML = '<span class="status-dot"></span>' + text;
+    }
+
+    function showToast(message) {
+      window.alert(message);
+    }
+
+    function formatDateTime(date = new Date()) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      const hh = String(date.getHours()).padStart(2, '0');
+      const mm = String(date.getMinutes()).padStart(2, '0');
+      const ss = String(date.getSeconds()).padStart(2, '0');
+      return `${y}-${m}-${d} ${hh}:${mm}:${ss}`;
+    }
+
+    function getAutoProjectName() {
+      const now = new Date();
+      const stamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
+      return `${currentMeta.autoPrefix}_${stamp}`;
+    }
+
+    function validateFile(file) {
+      if (!file) return { ok: false, message: '未选择文件。' };
+      const supportedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/heic', 'image/heif'];
+      const ext = (file.name.split('.').pop() || '').toLowerCase();
+      const supportedExt = ['png', 'jpg', 'jpeg', 'heic', 'heif'];
+      const isSupportedType = supportedTypes.includes(file.type) || file.type.startsWith('image/');
+      const isSupportedExt = supportedExt.includes(ext);
+
+      if (!isSupportedType && !isSupportedExt) {
+        return { ok: false, message: '仅支持 png、jpg、jpeg，预留兼容 heif、heic 格式。' };
+      }
+
+      if ((ext === 'heic' || ext === 'heif') && !file.type) {
+        return { ok: true, warning: '当前浏览器可能无法直接解析 HEIC/HEIF，请优先转为 JPG 再上传。' };
+      }
+
+      return { ok: true };
+    }
+
+    function resetCalibration() {
+      calibrationData = null;
+      selectedCalibrationPoints = [];
+      setStatus(calibrationStatus, '未校准', false);
+      overlayNote.style.display = imgLoaded ? 'block' : 'none';
+    }
+
+    function resetDetection(keepImage = false) {
+      resetCalibration();
+      currentResult = null;
+      resultPanel.style.display = 'none';
+      rgbText.textContent = '-';
+      hexText.textContent = '-';
+      rangeText.textContent = '-';
+      recommendationText.textContent = '-';
+      resultIndicator.textContent = currentMeta.title;
+      colorBox.style.background = '#ffffff';
+
+      if (!keepImage) {
+        imgLoaded = false;
+        imagePreview.removeAttribute('src');
+        previewShell.style.display = 'none';
+        uploadSection.style.display = 'grid';
+        previewHint.textContent = '图片已上传，请先完成校准，再点击样品检测区域。';
+        overlayNote.style.display = 'none';
+        setStatus(detectStatus, '等待上传', false);
+        setStatus(imageReadyStatus, '图片待分析', false);
+        uploadInput.value = '';
+      }
+    }
+
+    function handleFileUpload(file) {
+      const validation = validateFile(file);
+      if (!validation.ok) {
+        showToast(validation.message);
+        return;
+      }
+
+      if (validation.warning) {
+        showToast(validation.warning);
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        imagePreview.src = e.target.result;
+        imagePreview.onload = () => {
+          imgLoaded = true;
+          uploadSection.style.display = 'none';
+          previewShell.style.display = 'block';
+          resetDetection(true);
+          overlayNote.style.display = 'block';
+          previewHint.textContent = '图片已上传，请点击“校准图像”并依次选择深色参考块、浅色参考块。';
+          setStatus(detectStatus, '图片已上传', true);
+          setStatus(imageReadyStatus, '等待校准', false);
+        };
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function getCanvasFromImage() {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      canvas.width = imagePreview.naturalWidth;
+      canvas.height = imagePreview.naturalHeight;
+      ctx.drawImage(imagePreview, 0, 0);
+      return { canvas, ctx };
+    }
+
+    function getImageCoordinates(event) {
+      const rect = imagePreview.getBoundingClientRect();
+      const x = Math.floor((event.clientX - rect.left) * (imagePreview.naturalWidth / rect.width));
+      const y = Math.floor((event.clientY - rect.top) * (imagePreview.naturalHeight / rect.height));
+      return { x, y };
+    }
+
+    function getAverageColorFromImage(ctx, cx, cy, size = 10) {
+      let r = 0, g = 0, b = 0, count = 0;
+
+      for (let dx = -size; dx <= size; dx++) {
+        for (let dy = -size; dy <= size; dy++) {
+          const px = cx + dx;
+          const py = cy + dy;
+
+          if (px >= 0 && py >= 0 && px < ctx.canvas.width && py < ctx.canvas.height) {
+            const data = ctx.getImageData(px, py, 1, 1).data;
+            r += data[0];
+            g += data[1];
+            b += data[2];
+            count += 1;
+          }
+        }
+      }
+
+      return [
+        Math.round(r / count),
+        Math.round(g / count),
+        Math.round(b / count)
+      ];
+    }
+
+    function calculateCoefficients(measuredDarkVal, measuredLightVal, idealDarkVal, idealLightVal) {
+      if (measuredLightVal === measuredDarkVal) {
+        return { a: 1, b: 0 };
+      }
+      const a = (idealLightVal - idealDarkVal) / (measuredLightVal - measuredDarkVal);
+      const b = idealDarkVal - a * measuredDarkVal;
+      return { a, b };
+    }
+
+    function calculateCalibration(measuredDark, measuredLight) {
+      return {
+        r: calculateCoefficients(measuredDark[0], measuredLight[0], 0, 255),
+        g: calculateCoefficients(measuredDark[1], measuredLight[1], 0, 255),
+        b: calculateCoefficients(measuredDark[2], measuredLight[2], 0, 255)
+      };
+    }
+
+    function applyCalibration(color, calibration) {
+      const [r, g, b] = color;
+      const clamp = (v) => Math.max(0, Math.min(255, Math.round(v)));
+      return [
+        clamp(calibration.r.a * r + calibration.r.b),
+        clamp(calibration.g.a * g + calibration.g.b),
+        clamp(calibration.b.a * b + calibration.b.b)
+      ];
+    }
+
+    function rgbToHex(r, g, b) {
+      return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase();
+    }
+
+    function colorDistance(c1, c2) {
+      return Math.sqrt(
+        Math.pow(c1[0] - c2[0], 2) +
+        Math.pow(c1[1] - c2[1], 2) +
+        Math.pow(c1[2] - c2[2], 2)
+      );
+    }
+
+    function findRange(rgb) {
+      const card = currentMeta.cards;
+      let minDist = Infinity;
+      let matched = null;
+
+      card.forEach(item => {
+        const dist = colorDistance(rgb, item.range);
+        if (dist < minDist) {
+          minDist = dist;
+          matched = item;
+        }
+      });
+
+      return matched;
+    }
+
+    function renderResult(rgb) {
+      const [r, g, b] = rgb;
+      const hex = rgbToHex(r, g, b);
+      const matched = findRange(rgb);
+
+      colorBox.style.background = hex;
+      rgbText.textContent = `${r}, ${g}, ${b}`;
+      hexText.textContent = hex;
+      resultIndicator.textContent = currentMeta.title;
+      rangeText.textContent = matched ? matched.value : '-';
+      recommendationText.textContent = matched ? matched.recommendation : '-';
+      resultPanel.style.display = 'block';
+
+      currentResult = {
+        indicator: currentIndicator,
+        indicatorName: currentMeta.title,
+        rgb,
+        hex,
+        value: matched ? matched.value : '-',
+        recommendation: matched ? matched.recommendation : '-',
+        time: formatDateTime()
+      };
+
+      resultStore[currentIndicator] = currentResult;
+      setStatus(detectStatus, '检测完成', true);
+      setStatus(imageReadyStatus, '已识别结果', true);
+      previewHint.textContent = '识别完成，可继续点击其他区域重新检测，或输出表格。';
+    }
+
+    function updateTableResultCells() {
+      tpResult.textContent = resultStore.tp ? `${resultStore.tp.value} - ${resultStore.tp.recommendation}` : '-';
+      tnResult.textContent = resultStore.tn ? `${resultStore.tn.value} - ${resultStore.tn.recommendation}` : '-';
+      codResult.textContent = resultStore.cod ? `${resultStore.cod.value} - ${resultStore.cod.recommendation}` : '-';
+    }
+
+    function openTableModal() {
+      if (!currentResult) {
+        showToast('请先完成当前指标检测，再输出表格。');
+        return;
+      }
+
+      if (!projectNameInput.value.trim()) {
+        projectNameInput.value = getAutoProjectName();
+      }
+      detectTime.textContent = currentResult.time || formatDateTime();
+      updateTableResultCells();
+      tableModal.style.display = 'block';
+    }
+
+    async function copyTableContent() {
+      updateTableResultCells();
+      const projectName = projectNameInput.value.trim() || getAutoProjectName();
+      const location = document.getElementById('detectLocation').value.trim() || '未知';
+      const user = document.getElementById('detectUser').value.trim() || '';
+      const content = [
+        `项目名称：${projectName}`,
+        `检测时间：${detectTime.textContent}`,
+        `检测位置：${location}`,
+        `检测人员：${user}`,
+        '',
+        `总磷(TP)：${tpResult.textContent}`,
+        `总氮(TN)：${tnResult.textContent}`,
+        `COD：${codResult.textContent}`
+      ].join('\n');
+
+      try {
+        await navigator.clipboard.writeText(content);
+        showToast('表格内容已复制到剪贴板。');
+      } catch (err) {
+        showToast('复制失败，请手动复制。');
+      }
+    }
+
+    function downloadTableFile() {
+      updateTableResultCells();
+      const projectName = projectNameInput.value.trim() || getAutoProjectName();
+      projectNameInput.value = projectName;
+
+      const location = document.getElementById('detectLocation').value.trim() || '未知';
+      const user = document.getElementById('detectUser').value.trim() || '';
+
+      const content = [
+        `项目名称\t${projectName}`,
+        `检测时间\t${detectTime.textContent}`,
+        `检测位置\t${location}`,
+        `检测人员\t${user}`,
+        '',
+        `总磷(TP)\t${tpResult.textContent}`,
+        `总氮(TN)\t${tnResult.textContent}`,
+        `COD\t${codResult.textContent}`
+      ].join('\n');
+
+      const blob = new Blob(['\ufeff' + content], { type: 'text/tab-separated-values;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${projectName}.tsv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    uploadSection.addEventListener('click', () => uploadInput.click());
+    captureBtn.addEventListener('click', () => uploadInput.click());
+    reuploadBtn.addEventListener('click', () => uploadInput.click());
+    backBtn.addEventListener('click', () => window.location.href = 'index_updated.html');
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      uploadSection.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        uploadSection.classList.add('drag-over');
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      uploadSection.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        uploadSection.classList.remove('drag-over');
+      });
+    });
+
+    uploadSection.addEventListener('drop', (e) => {
+      const file = e.dataTransfer.files && e.dataTransfer.files[0];
+      if (file) handleFileUpload(file);
+    });
+
+    uploadInput.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (file) handleFileUpload(file);
+    });
+
+    calibrateBtn.addEventListener('click', () => {
+      if (!imgLoaded) {
+        showToast('请先上传图片。');
+        return;
+      }
+      selectedCalibrationPoints = [];
+      overlayNote.style.display = 'block';
+      previewHint.textContent = '校准模式：请先点击深色参考块，再点击浅色参考块。';
+      setStatus(imageReadyStatus, '校准进行中', false);
+      showToast('请依次点击图片中的深色参考块和浅色参考块完成校准。');
+    });
+
+    imagePreview.addEventListener('click', (event) => {
+      if (!imgLoaded) return;
+
+      const { ctx } = getCanvasFromImage();
+      const { x, y } = getImageCoordinates(event);
+      const avgColor = getAverageColorFromImage(ctx, x, y, 10);
+
+      if (selectedCalibrationPoints.length < 2) {
+        selectedCalibrationPoints.push(avgColor);
+
+        if (selectedCalibrationPoints.length === 1) {
+          previewHint.textContent = '已选中深色参考块，请继续点击浅色参考块。';
+          showToast('已选择深色参考块，请继续点击浅色参考块。');
+          return;
+        }
+
+        calibrationData = calculateCalibration(selectedCalibrationPoints[0], selectedCalibrationPoints[1]);
+        setStatus(calibrationStatus, '已校准', true);
+        setStatus(imageReadyStatus, '可点击样品区域识别', true);
+        previewHint.textContent = '校准完成，请点击样品检测区域获取结果。';
+        overlayNote.style.display = 'none';
+        showToast('校准完成，现在请点击样品检测区域获取结果。');
+        return;
+      }
+
+      if (!calibrationData) {
+        showToast('请先完成校准。');
+        return;
+      }
+
+      const correctedColor = applyCalibration(avgColor, calibrationData);
+      renderResult(correctedColor);
+    });
+
+    resetBtn.addEventListener('click', () => resetDetection(false));
+
+    continueBtn.addEventListener('click', () => {
+      resultPanel.style.display = 'none';
+      currentResult = null;
+      setStatus(imageReadyStatus, '可继续识别其他区域', true);
+      previewHint.textContent = '请继续点击图片中的其他样品区域进行检测。';
+    });
+
+    outputTableBtn.addEventListener('click', openTableModal);
+    closeModalBtn.addEventListener('click', () => tableModal.style.display = 'none');
+    tableModal.addEventListener('click', (e) => {
+      if (e.target === tableModal) tableModal.style.display = 'none';
+    });
+
+    projectNameInput.addEventListener('blur', () => {
+      if (!projectNameInput.value.trim()) {
+        projectNameInput.value = getAutoProjectName();
+      }
+    });
+
+    copyTableBtn.addEventListener('click', copyTableContent);
+    downloadTableBtn.addEventListener('click', downloadTableFile);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && tableModal.style.display === 'block') {
+        tableModal.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
