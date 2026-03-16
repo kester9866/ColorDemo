@@ -184,12 +184,32 @@
       text-align: center;
     }
 
-    .swatch {
+    .reference-media {
       width: 100%;
-      height: 84px;
+      height: 132px;
       border-radius: 14px;
       margin-bottom: 10px;
       border: 1px solid rgba(0,0,0,.12);
+      overflow: hidden;
+      background: linear-gradient(135deg, #f7fbff, #eef5fb);
+      display: grid;
+      place-items: center;
+    }
+
+    .reference-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      background: #fff;
+      cursor: zoom-in;
+    }
+
+    .reference-placeholder {
+      padding: 16px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 13px;
     }
 
     .tools {
@@ -441,6 +461,34 @@
       border: 1px solid rgba(23,125,220,.08);
     }
 
+    .image-modal-content {
+      width: min(1100px, 100%);
+      margin: 28px auto;
+      background: rgba(255,255,255,.98);
+      border-radius: 26px;
+      box-shadow: 0 28px 60px rgba(8, 32, 59, .24);
+      overflow: hidden;
+      border: 1px solid rgba(23,125,220,.08);
+    }
+
+    .image-modal-body {
+      padding: 18px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(180deg, #fcfeff 0%, #f2f8fd 100%);
+    }
+
+    .image-modal-body img {
+      width: 100%;
+      max-width: 100%;
+      max-height: 78vh;
+      object-fit: contain;
+      display: block;
+      border-radius: 18px;
+      background: #fff;
+      border: 1px solid rgba(23,125,220,.08);
+    }
+
     .modal-head {
       padding: 20px 24px;
       display: flex;
@@ -590,14 +638,18 @@
         <h3 style="margin-top:22px;">本地参考色纸</h3>
         <div class="color-card">
           <div class="swatch-card">
-            <div class="swatch" style="background:#111111;"></div>
-            <strong>灰度 0%</strong>
-            <div class="subtle">深色参考块</div>
+            <div class="reference-media">
+              <div class="reference-placeholder">正在加载当前指标参考图...</div>
+            </div>
+            <strong>当前指标参考图</strong>
+            <div class="subtle">页面加载时自动显示本地参考图</div>
           </div>
           <div class="swatch-card">
-            <div class="swatch" style="background:#ffffff;"></div>
-            <strong>灰度 100%</strong>
-            <div class="subtle">浅色参考块</div>
+            <div class="reference-media">
+              <div class="reference-placeholder">若本地文件缺失，系统将显示占位说明。</div>
+            </div>
+            <strong>参考图区说明</strong>
+            <div class="subtle">支持不同指标切换对应比色卡</div>
           </div>
         </div>
 
@@ -672,7 +724,7 @@
                   <div class="value" id="range">-</div>
                 </div>
                 <div class="kv highlight" style="grid-column: 1 / -1;">
-                  <div class="label">处理建议</div>
+                  <div class="label">判定结果</div>
                   <div class="value" id="recommendation">-</div>
                 </div>
               </div>
@@ -720,8 +772,8 @@
                 <td colspan="3" id="tpResult">-</td>
               </tr>
               <tr>
-                <th>总氮(TN)</th>
-                <td colspan="3" id="tnResult">-</td>
+                <th>总氨氮(AN)</th>
+                <td colspan="3" id="anResult">-</td>
               </tr>
               <tr>
                 <th>COD</th>
@@ -738,8 +790,23 @@
       </div>
     </div>
 
+    <div class="modal" id="referenceImageModal">
+      <div class="image-modal-content">
+        <div class="modal-head">
+          <div>
+            <h2 id="referenceModalTitle">参考色纸预览</h2>
+            <!-- <div class="subtle">点击遮罩层、右上角关闭按钮，或按 `Esc` 键退出放大预览。</div> -->
+          </div>
+          <button class="close" id="closeReferenceModalBtn" aria-label="关闭参考图预览">&times;</button>
+        </div>
+        <div class="image-modal-body">
+          <img id="referenceModalImage" alt="参考色纸放大预览" />
+        </div>
+      </div>
+    </div>
+
     <footer class="footer">
-      <div>版权归 © xxx 所有</div>
+      <div>版权归 © wjy 所有</div>
       <div>2026年</div>
       <div>版本号：V1.0.0</div>
     </footer>
@@ -752,6 +819,8 @@
         short: 'TP',
         chip: 'Aquacheck · 总磷检测',
         autoPrefix: '总磷检测',
+        referenceImage: './static/pic/磷比色卡.jpg',
+        referenceName: '磷比色卡',
         cards: [
           { value: "0–0.1 mg/L", range: [250, 250, 250], recommendation: "极低磷水平，水体贫营养或较健康；一般无需处理，保持现有管理，避免农业面源污染与含磷洗涤剂入水体" },
           { value: "0.1–0.2 mg/L", range: [220, 220, 220], recommendation: "低磷水平，水体基本健康；建议持续监测，控制生活污水、农业径流等磷输入" },
@@ -762,19 +831,21 @@
           { value: "1.5–2.0 mg/L", range: [70, 70, 70], recommendation: "严重磷污染；系统治理，深度除磷、面源污染控制、水体修复" }
         ]
       },
-      tn: {
-        title: '总氮(TN)检测',
-        short: 'TN',
-        chip: 'Aquacheck · 总氮检测',
-        autoPrefix: '总氮检测',
+      an: {
+        title: '总氨氮(AN)检测',
+        short: 'AN',
+        chip: 'Aquacheck · 总氨氮检测',
+        autoPrefix: '总氨氮检测',
+        referenceImage: './static/pic/氨氮比色卡.png',
+        referenceName: '氨氮比色卡',
         cards: [
-          { value: "0–0.5 mg/L", range: [255, 255, 200], recommendation: "极低氮水平，水体贫营养；保持现有管理措施" },
-          { value: "0.5–1.0 mg/L", range: [255, 240, 150], recommendation: "低氮水平，水体基本健康；建议持续监测" },
-          { value: "1.0–1.5 mg/L", range: [255, 200, 100], recommendation: "氮含量适中，注意潜在富营养化风险；加强监测" },
-          { value: "1.5–2.5 mg/L", range: [255, 150, 50], recommendation: "氮含量偏高，存在富营养化风险；采取控氮措施" },
-          { value: "2.5–5.0 mg/L", range: [255, 100, 0], recommendation: "氮污染较明显；开展污染源排查" },
-          { value: "5.0–10.0 mg/L", range: [200, 70, 0], recommendation: "较高氮污染；立即治理" },
-          { value: "10.0–20.0 mg/L", range: [150, 40, 0], recommendation: "严重氮污染；系统治理" }
+          { value: "0–0.025 mg/L", range: [255, 255, 230], recommendation: "水质评价：极低浓度，水质优良；可能来源：自然背景水体；建议措施：水体基本未受氨氮污染，建议保持现有水环境管理措施，定期监测即可" },
+          { value: "0.025–0.15 mg/L", range: [247, 236, 186], recommendation: "水质评价：接近地表水 I 类标准，水质良好；可能来源：少量自然有机分解；建议措施：水体总体较清洁，可维持现有保护措施，避免生活污水或农业径流进入水体" },
+          { value: "0.15–0.2 mg/L", range: [241, 213, 146], recommendation: "水质评价：接近养殖安全限值；可能来源：轻微生活或农业污染；建议措施：建议加强水质监测，减少生活污水排放和农业化肥径流，防止氨氮进一步升高" },
+          { value: "0.2–0.5 mg/L", range: [234, 190, 115], recommendation: "水质评价：达到地表水 II 类标准上限；可能来源：农业面源、生活污水；建议措施：建议排查污染来源，加强污水收集处理，减少氮肥流失，防止水体富营养化" },
+          { value: "0.5–1.0 mg/L", range: [224, 162, 83], recommendation: "水质评价：地表水 III 类标准附近，存在生态风险；可能来源：生活污水或养殖排水；建议措施：建议加强污染控制措施，如提高污水处理效率、控制养殖排水和农业面源污染" },
+          { value: "1.0–2.0 mg/L", range: [206, 122, 55], recommendation: "水质评价：已超过多数地表水生态安全阈值；可能来源：污水排放、养殖废水；建议措施：建议开展污染源调查，加强污水处理和氨污染治理，必要时进行水体生态修复" },
+          { value: ">2.0 mg/L", range: [172, 85, 34], recommendation: "水质评价：严重氨氮污染；可能来源：城镇污水或工业排放；建议措施：建议立即排查污染源，强化污水处理措施（如硝化反硝化处理），并开展连续水质监测" }
         ]
       },
       cod: {
@@ -782,6 +853,8 @@
         short: 'COD',
         chip: 'Aquacheck · COD检测',
         autoPrefix: 'COD检测',
+        referenceImage: './static/pic/COD比色卡.png',
+        referenceName: 'COD比色卡',
         cards: [
           { value: "0–10 mg/L", range: [240, 255, 240], recommendation: "极低COD值，水质优良；保持现有保护措施" },
           { value: "10–25 mg/L", range: [200, 255, 200], recommendation: "低COD值，水质良好；建议持续监测" },
@@ -794,7 +867,8 @@
       }
     };
 
-    const currentIndicator = localStorage.getItem('currentIndicator') || 'tp';
+    const storedIndicator = localStorage.getItem('currentIndicator');
+    const currentIndicator = storedIndicator === 'tn' ? 'an' : (storedIndicator || 'tp');
     const currentMeta = indicatorMeta[currentIndicator] || indicatorMeta.tp;
 
     const indicatorTitle = document.getElementById('indicatorTitle');
@@ -823,11 +897,15 @@
     const backBtn = document.getElementById('backBtn');
     const calibrationStatus = document.getElementById('calibrationStatus');
     const tableModal = document.getElementById('tableModal');
+    const referenceImageModal = document.getElementById('referenceImageModal');
+    const referenceModalTitle = document.getElementById('referenceModalTitle');
+    const referenceModalImage = document.getElementById('referenceModalImage');
     const closeModalBtn = document.getElementById('closeModalBtn');
+    const closeReferenceModalBtn = document.getElementById('closeReferenceModalBtn');
     const projectNameInput = document.getElementById('projectName');
     const detectTime = document.getElementById('detectTime');
     const tpResult = document.getElementById('tpResult');
-    const tnResult = document.getElementById('tnResult');
+    const anResult = document.getElementById('anResult');
     const codResult = document.getElementById('codResult');
     const copyTableBtn = document.getElementById('copyTableBtn');
     const downloadTableBtn = document.getElementById('downloadTableBtn');
@@ -838,13 +916,64 @@
     let currentResult = null;
     let resultStore = {
       tp: null,
-      tn: null,
+      an: null,
       cod: null
     };
 
     indicatorTitle.textContent = currentMeta.title;
     pageChip.textContent = currentMeta.chip;
     resultIndicator.textContent = currentMeta.title;
+
+    function renderReferenceCard() {
+      const colorCard = document.querySelector('.color-card');
+      colorCard.innerHTML = `
+        <div class="swatch-card">
+          <div class="reference-media">
+            <img id="referenceImage" alt="${currentMeta.referenceName}" title="点击查看放大图" />
+            <div class="reference-placeholder" id="referencePlaceholder" hidden>
+              当前指标参考图预留位置<br />${currentMeta.referenceName}<br />文件未找到
+            </div>
+          </div>
+          <strong>${currentMeta.referenceName}</strong>
+          <!-- <div class="subtle">页面加载时自动显示本地参考图</div> -->
+        </div>
+        <!-- <div class="swatch-card">
+          <div class="reference-media">
+            <div class="reference-placeholder">
+              支持根据当前指标切换参考图。<br />若本地缺少图片，系统保留占位以便后续补充。
+            </div>
+          </div>
+          <strong>参考图区说明</strong>
+          <div class="subtle">图片路径：${currentMeta.referenceImage}</div>
+        </div> -->
+      `;
+
+      const referenceImage = document.getElementById('referenceImage');
+      const referencePlaceholder = document.getElementById('referencePlaceholder');
+      referenceImage.src = currentMeta.referenceImage;
+      referenceImage.addEventListener('load', () => {
+        referenceImage.hidden = false;
+        referencePlaceholder.hidden = true;
+      });
+      referenceImage.addEventListener('error', () => {
+        referenceImage.hidden = true;
+        referencePlaceholder.hidden = false;
+      });
+      referenceImage.addEventListener('click', () => openReferenceImageModal());
+    }
+
+    renderReferenceCard();
+
+    function openReferenceImageModal() {
+      referenceModalTitle.textContent = `${currentMeta.referenceName}放大预览`;
+      referenceModalImage.src = currentMeta.referenceImage;
+      referenceModalImage.alt = `${currentMeta.referenceName}放大预览`;
+      referenceImageModal.style.display = 'block';
+    }
+
+    function closeReferenceImageModal() {
+      referenceImageModal.style.display = 'none';
+    }
 
     function setStatus(el, text, active = false) {
       el.classList.toggle('active', active);
@@ -1076,7 +1205,7 @@
 
     function updateTableResultCells() {
       tpResult.textContent = resultStore.tp ? `${resultStore.tp.value} - ${resultStore.tp.recommendation}` : '-';
-      tnResult.textContent = resultStore.tn ? `${resultStore.tn.value} - ${resultStore.tn.recommendation}` : '-';
+      anResult.textContent = resultStore.an ? `${resultStore.an.value} - ${resultStore.an.recommendation}` : '-';
       codResult.textContent = resultStore.cod ? `${resultStore.cod.value} - ${resultStore.cod.recommendation}` : '-';
     }
 
@@ -1106,7 +1235,7 @@
         `检测人员：${user}`,
         '',
         `总磷(TP)：${tpResult.textContent}`,
-        `总氮(TN)：${tnResult.textContent}`,
+        `总氨氮(AN)：${anResult.textContent}`,
         `COD：${codResult.textContent}`
       ].join('\n');
 
@@ -1133,7 +1262,7 @@
         `检测人员\t${user}`,
         '',
         `总磷(TP)\t${tpResult.textContent}`,
-        `总氮(TN)\t${tnResult.textContent}`,
+        `总氨氮(AN)\t${anResult.textContent}`,
         `COD\t${codResult.textContent}`
       ].join('\n');
 
@@ -1234,8 +1363,12 @@
 
     outputTableBtn.addEventListener('click', openTableModal);
     closeModalBtn.addEventListener('click', () => tableModal.style.display = 'none');
+    closeReferenceModalBtn.addEventListener('click', closeReferenceImageModal);
     tableModal.addEventListener('click', (e) => {
       if (e.target === tableModal) tableModal.style.display = 'none';
+    });
+    referenceImageModal.addEventListener('click', (e) => {
+      if (e.target === referenceImageModal) closeReferenceImageModal();
     });
 
     projectNameInput.addEventListener('blur', () => {
@@ -1248,7 +1381,12 @@
     downloadTableBtn.addEventListener('click', downloadTableFile);
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && tableModal.style.display === 'block') {
+      if (e.key !== 'Escape') return;
+      if (referenceImageModal.style.display === 'block') {
+        closeReferenceImageModal();
+        return;
+      }
+      if (tableModal.style.display === 'block') {
         tableModal.style.display = 'none';
       }
     });
