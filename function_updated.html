@@ -605,7 +605,7 @@
       <div>
         <div class="chip" id="pageChip">Aquacheck · 指标检测</div>
         <h1 id="indicatorTitle">总磷(TP)检测</h1>
-        <p>请在自然光下，使用相机拍摄检测完成后的试剂盒，并点击上传文件。上传后可点击样品区域进行识别，系统将输出结果与建议，并支持表格导出。</p>
+        <p id="indicatorDescription">请在自然光下，使用相机拍摄检测完成后的试剂盒，并点击上传文件。上传后可点击样品区域进行识别，系统将输出结果与建议，并支持表格导出。</p>
       </div>
       <div class="header-actions">
         <button class="back-btn" id="backBtn">← 返回首页</button>
@@ -772,11 +772,11 @@
                 <td colspan="3" id="tpResult">-</td>
               </tr>
               <tr>
-                <th>总氨氮(AN)</th>
+                <th>氨氮(AN)</th>
                 <td colspan="3" id="anResult">-</td>
               </tr>
               <tr>
-                <th>COD</th>
+                <th>CODmn</th>
                 <td colspan="3" id="codResult">-</td>
               </tr>
             </tbody>
@@ -819,6 +819,7 @@
         short: 'TP',
         chip: 'Aquacheck · 总磷检测',
         autoPrefix: '总磷检测',
+        description: '请在自然光下，使用相机拍摄检测完成后的试剂盒，并点击上传文件。上传后可点击样品区域进行识别，系统将输出结果与建议，并支持表格导出。',
         referenceImage: './static/pic/磷比色卡.jpg',
         referenceName: '磷比色卡',
         cards: [
@@ -832,10 +833,11 @@
         ]
       },
       an: {
-        title: '总氨氮(AN)检测',
+        title: '氨氮(AN)检测',
         short: 'AN',
-        chip: 'Aquacheck · 总氨氮检测',
-        autoPrefix: '总氨氮检测',
+        chip: 'Aquacheck · 氨氮检测',
+        autoPrefix: '氨氮检测',
+        description: '请在自然光下拍摄氨氮试剂盒显色结果，完成校准后点击样品区域。系统会结合氨氮比色卡输出浓度区间、水质评价、可能来源与控制建议。',
         referenceImage: './static/pic/氨氮比色卡.png',
         referenceName: '氨氮比色卡',
         cards: [
@@ -849,20 +851,20 @@
         ]
       },
       cod: {
-        title: '化学需氧量(COD)检测',
+        title: '高锰酸盐指数(CODMn)检测',
         short: 'COD',
-        chip: 'Aquacheck · COD检测',
-        autoPrefix: 'COD检测',
+        chip: 'Aquacheck · CODmn检测',
+        autoPrefix: 'CODmn检测',
+        description: '请在自然光下拍摄试剂盒显色结果，完成校准后点击样品区域。系统会结合CODmn比色卡输出浓度区间、水质评价、可能来源与控制建议。',
         referenceImage: './static/pic/COD比色卡.png',
         referenceName: 'COD比色卡',
         cards: [
-          { value: "0–10 mg/L", range: [240, 255, 240], recommendation: "极低COD值，水质优良；保持现有保护措施" },
-          { value: "10–25 mg/L", range: [200, 255, 200], recommendation: "低COD值，水质良好；建议持续监测" },
-          { value: "25–50 mg/L", range: [150, 255, 150], recommendation: "COD值正常，注意潜在污染风险；加强监测" },
-          { value: "50–100 mg/L", range: [100, 255, 100], recommendation: "COD值偏高，存在有机污染风险；采取控污措施" },
-          { value: "100–200 mg/L", range: [50, 255, 50], recommendation: "有机污染较明显；开展污染源排查" },
-          { value: "200–300 mg/L", range: [0, 200, 0], recommendation: "较高有机污染；立即治理" },
-          { value: "300–500 mg/L", range: [0, 150, 0], recommendation: "严重有机污染；系统治理" }
+          { value: "0 mg/L", range: [233, 123, 134], recommendation: "水质评价：CODMn 极低，水体中可氧化有机物含量很低，水质优良；可能情况：受生活污水、养殖尾水或工业有机废水影响较小；建议措施：维持现有保护措施，持续做好日常巡检与源头管控。" },
+          { value: "50 mg/L", range: [224, 117, 108], recommendation: "水质评价：CODMn 处于较低水平，但已出现一定有机物负荷；可能来源：轻微生活排水、地表径流夹带有机物；建议措施：建议保持连续监测，关注降雨后或排口附近水质波动。" },
+          { value: "100 mg/L", range: [225, 160, 158], recommendation: "水质评价：CODMn 中等，说明水体有机污染开始加重；可能来源：生活污水汇入、养殖排水或局部工业废水影响；建议措施：建议排查周边排口和汇水区，防止污染持续累积。" },
+          { value: "200 mg/L", range: [220, 159, 128], recommendation: "水质评价：CODMn 偏高，表明可氧化有机物含量明显上升，存在较明确污染风险；可能来源：污水直排、畜禽养殖废水、食品加工等高有机负荷排放；建议措施：建议尽快开展污染源调查，加强截污与预处理措施。" },
+          { value: "400 mg/L", range: [222, 190, 149], recommendation: "水质评价：CODMn 很高，水体有机污染较重，生态风险显著；可能来源：较高浓度生活污水、工业废水或长期累积污染；建议措施：建议立即采取控污和治理措施，并结合其他指标开展连续监测。" },
+          { value: "800 mg/L", range: [230, 202, 170], recommendation: "水质评价：CODMn 极高，提示水体受到严重有机污染；可能来源：高浓度有机废水排放或突发污染事件；建议措施：建议立即排查污染源，启动应急处置和系统治理，必要时限制相关排放并开展水体修复。" }
         ]
       }
     };
@@ -872,6 +874,7 @@
     const currentMeta = indicatorMeta[currentIndicator] || indicatorMeta.tp;
 
     const indicatorTitle = document.getElementById('indicatorTitle');
+    const indicatorDescription = document.getElementById('indicatorDescription');
     const pageChip = document.getElementById('pageChip');
     const uploadSection = document.getElementById('uploadSection');
     const uploadInput = document.getElementById('upload-input');
@@ -921,6 +924,7 @@
     };
 
     indicatorTitle.textContent = currentMeta.title;
+    indicatorDescription.textContent = currentMeta.description;
     pageChip.textContent = currentMeta.chip;
     resultIndicator.textContent = currentMeta.title;
 
@@ -1235,8 +1239,8 @@
         `检测人员：${user}`,
         '',
         `总磷(TP)：${tpResult.textContent}`,
-        `总氨氮(AN)：${anResult.textContent}`,
-        `COD：${codResult.textContent}`
+        `氨氮(AN)：${anResult.textContent}`,
+        `CODmn：${codResult.textContent}`
       ].join('\n');
 
       try {
@@ -1262,8 +1266,8 @@
         `检测人员\t${user}`,
         '',
         `总磷(TP)\t${tpResult.textContent}`,
-        `总氨氮(AN)\t${anResult.textContent}`,
-        `COD\t${codResult.textContent}`
+        `氨氮(AN)\t${anResult.textContent}`,
+        `CODmn\t${codResult.textContent}`
       ].join('\n');
 
       const blob = new Blob(['\ufeff' + content], { type: 'text/tab-separated-values;charset=utf-8;' });
