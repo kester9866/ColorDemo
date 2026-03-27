@@ -182,27 +182,39 @@
       border-radius: 18px;
       padding: 14px;
       text-align: center;
+      min-height: 240px;
+      display: flex;
+      flex-direction: column;
     }
 
     .reference-media {
-      width: 100%;
-      height: 132px;
+      width: min(100%, 220px);
+      height: 128px;
       border-radius: 14px;
       margin-bottom: 10px;
       border: 1px solid rgba(0,0,0,.12);
       overflow: hidden;
       background: linear-gradient(135deg, #f7fbff, #eef5fb);
-      display: grid;
-      place-items: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      margin-top: auto;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: inset 0 0 0 1px rgba(23,125,220,.05);
     }
 
     .reference-media img {
       width: 100%;
       height: 100%;
       object-fit: contain;
+      object-position: center center;
       display: block;
       background: #fff;
       cursor: zoom-in;
+      border-radius: 10px;
+      box-shadow: 0 10px 20px rgba(20, 50, 74, .08);
     }
 
     .reference-placeholder {
@@ -595,6 +607,8 @@
       .header, .panel, .preview-shell, .result-panel { padding: 18px; border-radius: 20px; }
       .modal-body, .modal-head { padding-left: 16px; padding-right: 16px; }
       .kv-grid, .color-card { grid-template-columns: 1fr; }
+      .swatch-card { min-height: 220px; }
+      .reference-media { width: min(100%, 210px); height: 120px; }
       .footer { flex-direction: column; }
     }
   </style>
@@ -806,9 +820,9 @@
     </div>
 
     <footer class="footer">
-      <div>版权归 © wjy 所有</div>
+      <div>版权归 © xxx 所有</div>
       <div>2026年</div>
-      <div>版本号：V1.0.0</div>
+      <div>版本号：v1.3.1</div>
     </footer>
   </main>
 
@@ -852,19 +866,18 @@
       },
       cod: {
         title: '高锰酸盐指数(CODMn)检测',
-        short: 'COD',
-        chip: 'Aquacheck · CODmn检测',
-        autoPrefix: 'CODmn检测',
-        description: '请在自然光下拍摄试剂盒显色结果，完成校准后点击样品区域。系统会结合CODmn比色卡输出浓度区间、水质评价、可能来源与控制建议。',
+        short: 'CODMn',
+        chip: 'Aquacheck · CODMn检测',
+        autoPrefix: 'CODMn检测',
+        description: '请在自然光下拍摄 CODMn 试剂盒显色结果，完成校准后点击样品区域。系统会结合 CODMn 比色卡输出浓度区间、水质评价与建议措施。',
         referenceImage: './static/pic/COD比色卡.png',
-        referenceName: 'COD比色卡',
+        referenceName: 'CODMn比色卡',
         cards: [
-          { value: "0 mg/L", range: [233, 123, 134], recommendation: "水质评价：CODMn 极低，水体中可氧化有机物含量很低，水质优良；可能情况：受生活污水、养殖尾水或工业有机废水影响较小；建议措施：维持现有保护措施，持续做好日常巡检与源头管控。" },
-          { value: "50 mg/L", range: [224, 117, 108], recommendation: "水质评价：CODMn 处于较低水平，但已出现一定有机物负荷；可能来源：轻微生活排水、地表径流夹带有机物；建议措施：建议保持连续监测，关注降雨后或排口附近水质波动。" },
-          { value: "100 mg/L", range: [225, 160, 158], recommendation: "水质评价：CODMn 中等，说明水体有机污染开始加重；可能来源：生活污水汇入、养殖排水或局部工业废水影响；建议措施：建议排查周边排口和汇水区，防止污染持续累积。" },
-          { value: "200 mg/L", range: [220, 159, 128], recommendation: "水质评价：CODMn 偏高，表明可氧化有机物含量明显上升，存在较明确污染风险；可能来源：污水直排、畜禽养殖废水、食品加工等高有机负荷排放；建议措施：建议尽快开展污染源调查，加强截污与预处理措施。" },
-          { value: "400 mg/L", range: [222, 190, 149], recommendation: "水质评价：CODMn 很高，水体有机污染较重，生态风险显著；可能来源：较高浓度生活污水、工业废水或长期累积污染；建议措施：建议立即采取控污和治理措施，并结合其他指标开展连续监测。" },
-          { value: "800 mg/L", range: [230, 202, 170], recommendation: "水质评价：CODMn 极高，提示水体受到严重有机污染；可能来源：高浓度有机废水排放或突发污染事件；建议措施：建议立即排查污染源，启动应急处置和系统治理，必要时限制相关排放并开展水体修复。" }
+          { value: "≤10 mg/L", range: [240, 255, 240], recommendation: "水质评价：水质较好，有机污染较低；建议措施：水体基本未受明显有机污染，建议保持现有管理措施，定期监测" },
+          { value: "10–20 mg/L", range: [200, 255, 200], recommendation: "水质评价：轻度有机污染；建议措施：建议加强水质监测，控制生活污水排放，减少有机物输入" },
+          { value: "20–30 mg/L", range: [150, 255, 150], recommendation: "水质评价：中度污染；建议措施：建议排查污染来源，优化污水收集与处理措施，减少有机污染物排放" },
+          { value: "30–40 mg/L", range: [100, 255, 100], recommendation: "水质评价：较高污染水平；建议措施：建议加强污水处理力度，提升处理效率（如强化生化处理），防止水质进一步恶化" },
+          { value: ">40 mg/L", range: [50, 220, 50], recommendation: "水质评价：严重有机污染；建议措施：建议立即开展污染源排查与治理，必要时采取应急处理措施，并进行连续监测" }
         ]
       }
     };
@@ -935,7 +948,7 @@
           <div class="reference-media">
             <img id="referenceImage" alt="${currentMeta.referenceName}" title="点击查看放大图" />
             <div class="reference-placeholder" id="referencePlaceholder" hidden>
-              当前指标参考图预留位置<br />${currentMeta.referenceName}<br />文件未找到
+              <br />${currentMeta.referenceName}<br />文件未找到
             </div>
           </div>
           <strong>${currentMeta.referenceName}</strong>
@@ -944,7 +957,7 @@
         <!-- <div class="swatch-card">
           <div class="reference-media">
             <div class="reference-placeholder">
-              支持根据当前指标切换参考图。<br />若本地缺少图片，系统保留占位以便后续补充。
+              <br />若本地缺少图片，系统保留占位以便后续补充。
             </div>
           </div>
           <strong>参考图区说明</strong>
